@@ -51,5 +51,13 @@ public class ChatServer {
     public synchronized void subscribe(ClientHandler o) {
         clients.add(o);
     }
+
+    public ClientHandler getClientByNick(String s) {
+        for (ClientHandler client : clients) {
+            if (s.equals(client.getName()))
+                return client;
+        }
+        return null;
+    }
 }
 
