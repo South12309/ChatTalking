@@ -26,14 +26,16 @@ public class ChatClient {
         socket = new Socket(SERVER_IP, SERVER_PORT);
         in = new DataInputStream(socket.getInputStream());
         out = new DataOutputStream(socket.getOutputStream());
-        new Thread(()->{
+        Thread thread = new Thread(()->{
             try {
                 waitAuth();
                 readMessage();
             } finally {
                 closeConnection();
             }
-        }).start();
+        });
+        thread.setDaemon(true);
+        thread.start();
     }
 
     private void readMessage() {
