@@ -65,6 +65,7 @@ public class ClientHandler {
             String strFromClient = in.readUTF();
             System.out.println("от " + name + ": " + strFromClient);
             if (strFromClient.equals("/end")) {
+                out.writeUTF("/end");
                 return;
             }
 
@@ -72,9 +73,8 @@ public class ClientHandler {
                 String[] split = strFromClient.split("\\s");
                 ClientHandler privateClient = chatServer.getClientByNick(split[1]);
                 if (privateClient!=null) {
-                    String msg = "Личное сообщение от " + name + ": " + strFromClient.replaceFirst("/w"+split[1], "");
-                    privateClient.sendMsg(msg);
-                    sendMsg(msg);
+                    privateClient.sendMsg("Личное сообщение от " + name + ": " + strFromClient.replaceFirst("/w "+split[1], ""));
+                    sendMsg("Личное сообщение для " + privateClient.getName() + ": " + strFromClient.replaceFirst("/w "+split[1], ""));
                 }
             } else {
                 chatServer.broadcastMsg(name + ": " + strFromClient);

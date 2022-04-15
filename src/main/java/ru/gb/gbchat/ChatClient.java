@@ -1,5 +1,8 @@
 package ru.gb.gbchat;
 
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -37,6 +40,10 @@ public class ChatClient {
         while (true) {
             try {
                 String msg = in.readUTF();
+                if ("/end".equals(msg)) {
+                    controller.toggleBoxesVisibility(false);
+                    break;
+                }
 
                 controller.addMessage(msg);
             } catch (IOException e) {
@@ -57,6 +64,10 @@ public class ChatClient {
                     controller.addMessage("Успешная авторизация под ником " + nick);
                     break;
                 }
+//                else {
+//                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Пользователь не найден", ButtonType.OK);
+//                    alert.showAndWait();
+//                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -67,15 +78,7 @@ public class ChatClient {
     private void closeConnection() {
         try {
             in.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
             out.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
             socket.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -86,9 +89,6 @@ public class ChatClient {
     public void sendMessage(String message) {
         try {
             out.writeUTF(message);
-            if ("/end".equals(message)) {
-                controller.toggleBoxesVisibility(false);
-            }
         } catch (IOException e) {
             e.printStackTrace();
         }
