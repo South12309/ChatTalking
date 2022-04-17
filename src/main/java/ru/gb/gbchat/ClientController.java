@@ -31,15 +31,16 @@ public class ClientController {
 
     public ClientController() {
         client = new ChatClient(this);
+
+    }
+
+    @FXML
+    protected void authButtonClick() {
         try {
             client.openConnection();
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    @FXML
-    protected void authButtonClick() {
         client.sendMessage("/auth " + loginField.getText() + " " + passwordField.getText());
     }
 

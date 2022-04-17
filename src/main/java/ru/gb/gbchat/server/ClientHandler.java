@@ -11,16 +11,17 @@ public class ClientHandler {
     private DataInputStream in;
     private DataOutputStream out;
     private String name;
+
     public String getName() {
         return name;
     }
+
     public ClientHandler(ChatServer chatServer, Socket socket) {
         try {
             this.chatServer = chatServer;
             this.socket = socket;
             this.in = new DataInputStream(socket.getInputStream());
             this.out = new DataOutputStream(socket.getOutputStream());
-            this.name = "";
             new Thread(() -> {
                 try {
                     authentication();
@@ -35,6 +36,7 @@ public class ClientHandler {
             throw new RuntimeException("Проблемы при создании обработчика клиента");
         }
     }
+
     public void authentication() throws IOException {
         while (true) {
             String str = in.readUTF();
@@ -57,19 +59,30 @@ public class ClientHandler {
             }
         }
     }
+
     public void readMessages() throws IOException {
         while (true) {
             String strFromClient = in.readUTF();
             System.out.println("от " + name + ": " + strFromClient);
             if (strFromClient.equals("/end")) {
+                out.writeUTF("/end");
                 return;
             }
 
+            if (strFromClient.startsWith("/w")) {
+                String[] split = strFromClient.split("\\s");
+                ClientHandler privateClient = chatServer.getClientByNick(split[1]);
+                if (privateClient!=null) {
+                    privateClient.sendMsg("Личное сообщение от " + name + ": " + strFromClient.replaceFirst("/w "+split[1], ""));
+                    sendMsg("Личное сообщение для " + privateClient.getName() + ": " + strFromClient.replaceFirst("/w "+split[1], ""));
+                }
+            } else {
                 chatServer.broadcastMsg(name + ": " + strFromClient);
+            }
 
-            
         }
     }
+
     public void sendMsg(String msg) {
         try {
             out.writeUTF(msg);
@@ -77,6 +90,7 @@ public class ClientHandler {
             e.printStackTrace();
         }
     }
+
     public void closeConnection() {
         chatServer.unsubscribe(this);
         chatServer.broadcastMsg(name + " вышел из чата");

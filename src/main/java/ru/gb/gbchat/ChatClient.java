@@ -1,5 +1,8 @@
 package ru.gb.gbchat;
 
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -23,14 +26,16 @@ public class ChatClient {
         socket = new Socket(SERVER_IP, SERVER_PORT);
         in = new DataInputStream(socket.getInputStream());
         out = new DataOutputStream(socket.getOutputStream());
-        new Thread(()->{
+        Thread thread = new Thread(()->{
             try {
                 waitAuth();
                 readMessage();
             } finally {
                 closeConnection();
             }
-        }).start();
+        });
+        thread.setDaemon(true);
+        thread.start();
     }
 
     private void readMessage() {
@@ -41,11 +46,10 @@ public class ChatClient {
                     controller.toggleBoxesVisibility(false);
                     break;
                 }
+
                 controller.addMessage(msg);
             } catch (IOException e) {
                 e.printStackTrace();
-            } finally {
-                closeConnection();
             }
         }
 
@@ -62,6 +66,10 @@ public class ChatClient {
                     controller.addMessage("Успешная авторизация под ником " + nick);
                     break;
                 }
+//                else {
+//                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Пользователь не найден", ButtonType.OK);
+//                    alert.showAndWait();
+//                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -70,21 +78,13 @@ public class ChatClient {
     }
 
     private void closeConnection() {
-//        try {
-//            in.close();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        try {
-//            out.close();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        try {
-//            socket.close();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+        try {
+            in.close();
+            out.close();
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 
