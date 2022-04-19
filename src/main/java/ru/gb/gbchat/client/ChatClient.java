@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import javax.swing.*;
 
 import javafx.application.Platform;
 import ru.gb.gbchat.Command;
@@ -29,7 +30,11 @@ public class ChatClient {
                 waitAuthenticate();
                 readMessage();
             } catch (IOException e) {
-                e.printStackTrace();
+                JOptionPane.showMessageDialog(null,
+                        "Таймаут авторизации или подключение с сервером закрыто",
+                        "Ошибка",
+                        JOptionPane.INFORMATION_MESSAGE);
+
             } finally {
                 closeConnection();
             }
@@ -65,6 +70,7 @@ public class ChatClient {
 
     private void waitAuthenticate() throws IOException {
         while (true) {
+
             final String msgAuth = in.readUTF();
             if (Command.isCommand(msgAuth)) {
                 final Command command = Command.getCommand(msgAuth);
@@ -82,7 +88,8 @@ public class ChatClient {
         }
     }
 
-    private void closeConnection() {
+    public void closeConnection() {
+
         if (socket != null) {
             try {
                 socket.close();
@@ -105,6 +112,7 @@ public class ChatClient {
             }
         }
         System.exit(0);
+
     }
 
     public void sendMessage(String message) {

@@ -67,9 +67,10 @@ public class Controller {
         public void setAuth(boolean success) {
             loginBox.setVisible(!success);
             messageBox.setVisible(success);
+            client.closeConnection();
         }
 
-        private void showNotification() {
+        public void showNotification() {
             final Alert alert = new Alert(Alert.AlertType.ERROR,
                     "Не могу подключится к серверу.\n" +
                             "Проверьте, что сервер запущен",
@@ -87,6 +88,7 @@ public class Controller {
             final Alert alert = new Alert(Alert.AlertType.ERROR, error[0], new ButtonType("OK", ButtonBar.ButtonData.OK_DONE));
             alert.setTitle("Ошибка!");
             alert.showAndWait();
+
         }
 
         public void selectClient(MouseEvent mouseEvent) {

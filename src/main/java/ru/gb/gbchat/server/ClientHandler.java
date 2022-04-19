@@ -8,6 +8,7 @@ import java.net.Socket;
 import ru.gb.gbchat.Command;
 
 public class ClientHandler {
+    private static final int TIMEOUT_AUTH = 12000;
     private final Socket socket;
     private final ChatServer server;
     private final DataInputStream in;
@@ -41,7 +42,8 @@ public class ClientHandler {
     }
 
     private void closeConnection() {
-        sendMessage(Command.END);
+        if (!nick.equals(""))
+            sendMessage(Command.END);
         try {
             if (in != null) {
                 in.close();
@@ -67,6 +69,19 @@ public class ClientHandler {
     }
 
     private void authenticate() {
+        Thread timeToAuth = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(TIMEOUT_AUTH);
+                    closeConnection();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        timeToAuth.setDaemon(true);
+        timeToAuth.start();
 
         while (true) {
             try {
@@ -87,6 +102,7 @@ public class ClientHandler {
                             this.nick = nick;
                             server.broadcast("Пользователь " + nick + " зашел в чат");
                             server.subscribe(this);
+                            timeToAuth.interrupt();
                             break;
                         } else {
                             sendMessage(Command.ERROR, "Неверные логин и пароль");
@@ -94,7 +110,8 @@ public class ClientHandler {
                     }
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println("Подключение потеряно для авторизации");
+                break;
             }
 
         }
@@ -133,7 +150,7 @@ public class ClientHandler {
                 server.broadcast(nick + ": " + msg);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Подключение потеряно для отправки сообщаения");
         }
 
     }
