@@ -69,15 +69,12 @@ public class ClientHandler {
     }
 
     private void authenticate() {
-        Thread timeToAuth = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(TIMEOUT_AUTH);
-                    closeConnection();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+        Thread timeToAuth = new Thread(() -> {
+            try {
+                Thread.sleep(TIMEOUT_AUTH);
+                closeConnection();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         });
         timeToAuth.setDaemon(true);
@@ -102,7 +99,6 @@ public class ClientHandler {
                             this.nick = nick;
                             server.broadcast("Пользователь " + nick + " зашел в чат");
                             server.subscribe(this);
-                            timeToAuth.interrupt();
                             break;
                         } else {
                             sendMessage(Command.ERROR, "Неверные логин и пароль");
@@ -116,6 +112,7 @@ public class ClientHandler {
 
         }
 
+        timeToAuth.interrupt();
     }
 
     public void sendMessage(Command command, String... params) {
@@ -140,6 +137,7 @@ public class ClientHandler {
                     final Command command = Command.getCommand(msg);
                     final String[] params = command.parse(msg);
                     if (command == Command.END) {
+                        server.broadcast(nick + " вышел из чата");
                         break;
                     }
                     if (command == Command.PRIVATE_MESSAGE) {

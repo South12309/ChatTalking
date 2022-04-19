@@ -67,7 +67,9 @@ public class Controller {
         public void setAuth(boolean success) {
             loginBox.setVisible(!success);
             messageBox.setVisible(success);
-            client.closeConnection();
+            if (!success)
+                client.closeConnection();
+
         }
 
         public void showNotification() {
