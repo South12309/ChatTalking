@@ -9,17 +9,20 @@ import java.sql.*;
 public class AuthServiceSQLlite implements AuthService {
     private static Connection connection;
 
+    public AuthServiceSQLlite() {
+        run();
+    }
 
     @Override
     public String getNickByLoginAndPassword(String login, String password) {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement("SELECT Nick from users WHERE login =? AND password=?;");
             preparedStatement.setString(1, login);
-            preparedStatement.setString(2, login);
-            preparedStatement.addBatch();
-            ResultSet resultSet = preparedStatement.getResultSet();
+            preparedStatement.setString(2, password);
+            ResultSet resultSet = preparedStatement.executeQuery();
             resultSet.next();
-            return resultSet.getString(2);
+            String nick = resultSet.getString(1);
+            return nick;
         } catch (SQLException e) {
             e.printStackTrace();
         }

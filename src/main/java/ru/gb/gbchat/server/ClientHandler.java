@@ -8,7 +8,7 @@ import java.net.Socket;
 import ru.gb.gbchat.Command;
 
 public class ClientHandler {
-    private static final int TIMEOUT_AUTH = 12000;
+    private static final int TIMEOUT_AUTH = 120000;
     private final Socket socket;
     private final ChatServer server;
     private final DataInputStream in;
