@@ -1,6 +1,7 @@
 package ru.gb.gbchat.server;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +14,21 @@ public class InMemoryAuthService implements AuthService {
         for (int i = 0; i < 5; i++) {
             users.add(new UserData("login" + i, "pass" + i, "nick" + i));
         }
+    }
+
+    @Override
+    public void setNewNick(String oldNick, String newNick) throws SQLException {
+        for (UserData user : users) {
+            if (newNick == user.nick) {
+                throw new SQLException("Такой ник уже занят");
+            }
+        }
+        for (UserData user : users) {
+            if (user.nick == oldNick) {
+                user.nick = newNick;
+            }
+        }
+
     }
 
     @Override
@@ -38,7 +54,7 @@ public class InMemoryAuthService implements AuthService {
     private static class UserData {
         private final String login;
         private final String password;
-        private final String nick;
+        private String nick;
 
         public UserData(String login, String password, String nick) {
             this.login = login;

@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.sql.SQLException;
 
 import ru.gb.gbchat.Command;
 
@@ -84,7 +85,13 @@ public class ClientHandler {
             try {
                 final String str = in.readUTF();
                 if (Command.isCommand(str)) {
-                    final Command command = Command.getCommand(str);
+                    final Command command;
+                    try {
+                        command = Command.getCommand(str);
+                    } catch (RuntimeException e) {
+                       sendMessage(e.getMessage());
+                        continue;
+                    }
                     final String[] params = command.parse(str);
                     if (command == Command.AUTH) {
                         final String login = params[0];
@@ -134,16 +141,41 @@ public class ClientHandler {
                 final String msg = in.readUTF();
                 System.out.println("Receive message: " + msg);
                 if (Command.isCommand(msg)) {
-                    final Command command = Command.getCommand(msg);
+                    final Command command;
+                    try {
+                        command = Command.getCommand(msg);
+                    } catch (RuntimeException e) {
+                        sendMessage(e.getMessage());
+                        continue;
+                    }
                     final String[] params = command.parse(msg);
                     if (command == Command.END) {
                         server.broadcast(nick + " вышел из чата");
+                        server.unsubscribe(this);
                         break;
                     }
                     if (command == Command.PRIVATE_MESSAGE) {
                         server.sendMessageToClient(this, params[0], params[1]);
                         continue;
                     }
+
+                    if (command == Command.RENAME) {
+                        try {
+                            authService.setNewNick(nick, params[0]);
+                            server.broadcast(nick + " изменил ник на " + params[0]);
+                            server.unsubscribe(this);
+                            nick=params[0];
+                            server.subscribe(this);
+
+                            continue;
+                        } catch (SQLException e) {
+                            sendMessage("Произошла ошибка или данный ник уже занят");
+                            continue;
+                        }
+
+                    }
+
+
                 }
                 server.broadcast(nick + ": " + msg);
             }

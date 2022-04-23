@@ -55,6 +55,12 @@ public enum Command {
             }
             return nicks;
         }
+    }, RENAME("/rename") {
+        @Override
+        public String[] parse(String commandText) {
+            final String[] split = commandText.split(COMMAND_DELIMITER, 2);
+            return new String[]{split[1]};
+        }
     };
 
     private static final Map<String, Command> map = Stream.of(Command.values())
@@ -81,7 +87,7 @@ public enum Command {
         return command;
     }
 
-    public static Command getCommand(String message) {
+    public static Command getCommand(String message) throws RuntimeException {
         message = message.trim();
         if (!isCommand(message)) {
             throw new RuntimeException("'" + message + "' is not a command");
@@ -98,7 +104,7 @@ public enum Command {
 
         final Command command = map.get(cmd);
         if (command == null) {
-            throw new RuntimeException("'" + cmd + "' unknown command");
+            throw new RuntimeException("'" + cmd + "' неизвестная команда");
         }
         return command;
     }

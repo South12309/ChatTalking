@@ -60,7 +60,12 @@ public class ChatClient {
                     continue;
                 }
                 if (command == Command.CLIENTS) {
-                    controller.updateClientList(params);
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            controller.updateClientList(params);
+                        }
+                    });
                     continue;
                 }
             }

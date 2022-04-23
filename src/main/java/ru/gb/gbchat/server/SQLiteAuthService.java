@@ -6,11 +6,20 @@ import java.io.IOException;
 import java.sql.*;
 
 
-public class AuthServiceSQLlite implements AuthService {
+public class SQLiteAuthService implements AuthService {
     private static Connection connection;
 
-    public AuthServiceSQLlite() {
+    public SQLiteAuthService() {
         run();
+    }
+
+    @Override
+    public void setNewNick(String oldNick, String newNick) throws SQLException {
+
+            PreparedStatement preparedStatement = connection.prepareStatement("UPDATE users SET nick = ? WHERE nick = ?;");
+            preparedStatement.setString(1, newNick);
+            preparedStatement.setString(2, oldNick);
+            preparedStatement.executeUpdate();
     }
 
     @Override

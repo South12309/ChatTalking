@@ -18,7 +18,7 @@ public class ChatServer {
 
     public void run() {
         try (ServerSocket serverSocket = new ServerSocket(8189);
-             AuthService authService = new AuthServiceSQLlite()) {
+             AuthService authService = new SQLiteAuthService()) {
             while (true) {
                 System.out.println("Wait client connection...");
                 final Socket socket = serverSocket.accept();
@@ -43,6 +43,7 @@ public class ChatServer {
         clients.remove(client.getNick());
         broadcastClientList();
     }
+
 
     private void broadcastClientList() {
         StringBuilder nicks = new StringBuilder();
