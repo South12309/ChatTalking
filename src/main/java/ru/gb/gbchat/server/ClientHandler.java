@@ -147,6 +147,7 @@ public class ClientHandler {
                     } catch (RuntimeException e) {
                         sendMessage(e.getMessage());
                         continue;
+
                     }
                     final String[] params = command.parse(msg);
                     if (command == Command.END) {
