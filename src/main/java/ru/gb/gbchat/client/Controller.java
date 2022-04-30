@@ -23,7 +23,12 @@ public class Controller {
         private HBox messageBox;
         @FXML
         private PasswordField passwordField;
-        @FXML
+
+    public TextField getLoginField() {
+        return loginField;
+    }
+
+    @FXML
         private TextField loginField;
         @FXML
         private HBox loginBox;
@@ -57,6 +62,7 @@ public class Controller {
         }
 
         public void addMessage(String message) {
+            client.saveMessageInHistoryFile(message + "\n");
             textArea.appendText(message + "\n");
         }
 
