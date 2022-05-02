@@ -2,11 +2,13 @@ package ru.gb.gbchat.client;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import javax.swing.*;
 
 import javafx.application.Platform;
 import ru.gb.gbchat.Command;
+
 
 public class ChatClient {
 
@@ -71,7 +73,7 @@ public class ChatClient {
                     continue;
                 }
             }
-            controller.addMessage(message);
+            controller.addMessage(message, true);
         }
     }
 
@@ -85,9 +87,10 @@ public class ChatClient {
                 if (command == Command.AUTHOK) {
                     final String nick = params[0];
                     fileOutput = new BufferedWriter(new FileWriter("local_" + controller.getLoginField().getText() + ".txt", StandardCharsets.UTF_8, true));
+                    loadHistory();
                     controller.addMessage("Успешная авторизация под ником " + nick);
                     controller.setAuth(true);
-                    loadHistory();
+
                     break;
                 }
                 if (Command.ERROR.equals(command)) {
@@ -112,20 +115,24 @@ public class ChatClient {
             randomAccessFile.seek(fileLength);
             for (long pointer = fileLength; pointer >= 0; pointer--) {
                 randomAccessFile.seek(pointer);
-                char c;
-                c = (char) randomAccessFile.read();
-                if (c == '\n') {
+                char ch  = (char)randomAccessFile.read();
+
+                if (ch=='\n') {
                     readLines++;
                     if (readLines == lines)
                         break;
                 }
-                builder.append(c);
+
+                builder.append(ch);
             }
-            controller.addMessage(builder.toString());
+            builder.reverse();
 
 
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            String historyLog = new String(builder.toString().getBytes("ISO-8859-1"), "UTF-8");
+
+            controller.addMessage(historyLog.trim());
+
+
         } catch (IOException e) {
             e.printStackTrace();
         } finally {

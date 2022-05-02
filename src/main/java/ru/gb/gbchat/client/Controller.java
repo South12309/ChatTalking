@@ -62,7 +62,11 @@ public class Controller {
         }
 
         public void addMessage(String message) {
-            client.saveMessageInHistoryFile(message + "\n");
+           addMessage(message, false);
+        }
+        public void addMessage(String message, boolean isShouldBeWriteToHistoryFile) {
+            if(isShouldBeWriteToHistoryFile)
+                client.saveMessageInHistoryFile(message + "\n");
             textArea.appendText(message + "\n");
         }
 
