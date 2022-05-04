@@ -5,15 +5,22 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import ru.gb.gbchat.Command;
 
 public class ChatServer {
 
     private final Map<String, ClientHandler> clients;
+    final private ExecutorService executorService= Executors.newCachedThreadPool();
 
     public ChatServer() {
         this.clients = new HashMap<>();
+    }
+
+    public ExecutorService getExecutorService() {
+        return executorService;
     }
 
     public void run() {
@@ -28,6 +35,7 @@ public class ChatServer {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        executorService.shutdownNow();
     }
 
     public boolean isNickBusy(String nick) {
