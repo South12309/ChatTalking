@@ -6,21 +6,11 @@ import java.nio.charset.StandardCharsets;
 public class LocalHistory implements Closeable {
 
     private BufferedWriter fileOutput;
-    final private Controller controller;
+    private String loginClient;
 
-    public LocalHistory(Controller controller) {
+    public String loadHistory() {
 
-        this.controller = controller;
-    }
-
-    public void loadHistory() {
-        try {
-            fileOutput = new BufferedWriter(new FileWriter("local_" + controller.getLoginField().getText() + ".txt", StandardCharsets.UTF_8, true));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        File file = new File("local_" + controller.getLoginField().getText() + ".txt");
+        File file = new File("local_" + loginClient + ".txt");
 
         int lines = 100;
         int readLines = 0;
@@ -48,7 +38,7 @@ public class LocalHistory implements Closeable {
 
             String historyLog = new String(builder.toString().getBytes("ISO-8859-1"), "UTF-8");
 
-            controller.addMessage(historyLog.trim());
+            return historyLog.trim();
 
 
         } catch (IOException e) {
@@ -63,7 +53,7 @@ public class LocalHistory implements Closeable {
                 }
             }
         }
-
+        return "История чата не загрузилась";
 
     }
 
@@ -80,6 +70,16 @@ public class LocalHistory implements Closeable {
     public void close() throws IOException {
         if (fileOutput != null) {
             fileOutput.close();
+        }
+    }
+
+    public void setLoginClientForFindHistoryFile(String loginClient) {
+        this.loginClient = loginClient;
+
+        try {
+            fileOutput = new BufferedWriter(new FileWriter("local_" + loginClient + ".txt", StandardCharsets.UTF_8, true));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

@@ -24,7 +24,7 @@ public class ChatClient {
         socket = new Socket("localhost", 8189);
         in = new DataInputStream(socket.getInputStream());
         out = new DataOutputStream(socket.getOutputStream());
-        localHistory = new LocalHistory(controller);
+        localHistory = new LocalHistory();
 
         final Thread readThread = new Thread(() -> {
             try {
@@ -89,8 +89,8 @@ public class ChatClient {
                 final String[] params = command.parse(msgAuth);
                 if (command == Command.AUTHOK) {
                     final String nick = params[0];
-
-                    localHistory.loadHistory();
+                    localHistory.setLoginClientForFindHistoryFile(controller.getLoginField().getText());
+                    addMessageToForm(localHistory.loadHistory(), false);
                     addMessageToForm("Успешная авторизация под ником " + nick, false);
                     controller.setAuth(true);
 
@@ -102,10 +102,6 @@ public class ChatClient {
             }
         }
     }
-
-
-
-
 
 
     public void closeConnection() {
