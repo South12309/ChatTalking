@@ -62,13 +62,9 @@ public class Controller {
         }
 
         public void addMessage(String message) {
-           addMessage(message, false);
-        }
-        public void addMessage(String message, boolean isShouldBeWriteToHistoryFile) {
-            if(isShouldBeWriteToHistoryFile)
-                client.saveMessageInHistoryFile(message + "\n");
             textArea.appendText(message + "\n");
         }
+
 
         public void btnAuthClick(ActionEvent actionEvent) {
             client.sendMessage(Command.AUTH, loginField.getText(), passwordField.getText());

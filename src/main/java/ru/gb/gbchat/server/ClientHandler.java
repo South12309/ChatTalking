@@ -27,18 +27,19 @@ public class ClientHandler {
             this.out = new DataOutputStream(socket.getOutputStream());
             this.authService = authService;
 
-            new Thread(() -> {
+            server.getExecutorService().execute(() -> {
                 try {
                     authenticate();
                     readMessages();
                 } finally {
                     closeConnection();
                 }
-            }).start();
+            });
 
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
 
     }
 
