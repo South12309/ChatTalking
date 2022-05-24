@@ -11,6 +11,7 @@ import java.util.concurrent.Executors;
 import ru.gb.gbchat.Command;
 
 public class ChatServer {
+    private static final Logger log = LogManager.getLogManager().getLogger(ChatServer.class);
 
     private final Map<String, ClientHandler> clients;
     final private ExecutorService executorService= Executors.newCachedThreadPool();
