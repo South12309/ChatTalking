@@ -8,10 +8,16 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+
+import org.apache.logging.log4j.LogManager;
 import ru.gb.gbchat.Command;
+import org.apache.logging.log4j.*;
+
 
 public class ChatServer {
-    private static final Logger log = LogManager.getLogManager().getLogger(ChatServer.class);
+
+
+    private static final Logger logger = LogManager.getLogger(ChatServer.class);
 
     private final Map<String, ClientHandler> clients;
     final private ExecutorService executorService= Executors.newCachedThreadPool();
@@ -25,8 +31,10 @@ public class ChatServer {
     }
 
     public void run() {
+
         try (ServerSocket serverSocket = new ServerSocket(8189);
              AuthService authService = new SQLiteAuthService()) {
+            logger.info("Сервер запущен");
             while (true) {
                 System.out.println("Wait client connection...");
                 final Socket socket = serverSocket.accept();
@@ -34,9 +42,11 @@ public class ChatServer {
                 System.out.println("Client connected");
             }
         } catch (IOException e) {
+            logger.error("Ошибка запуска сервера" +e.getMessage());
             e.printStackTrace();
         }
         executorService.shutdownNow();
+        logger.info("Сервер остановлен");
     }
 
     public boolean isNickBusy(String nick) {
@@ -46,11 +56,14 @@ public class ChatServer {
     public void subscribe(ClientHandler client) {
         clients.put(client.getNick(), client);
         broadcastClientList();
+        logger.info(client.getNick() + " подключен");
+
     }
 
     public void unsubscribe(ClientHandler client) {
         clients.remove(client.getNick());
         broadcastClientList();
+        logger.info(client.getNick() + " отключен");
     }
 
 
@@ -80,6 +93,7 @@ public class ChatServer {
         if (receiver != null) {
             receiver.sendMessage("от " + sender.getNick() + ": " + message);
             sender.sendMessage("участнику " + to + ": " + message);
+            logger.info("Личное сообщение от " + sender.getNick() + " участнику " + to + ": " + message);
         } else {
             sender.sendMessage(Command.ERROR, "Участника с ником " + to + " нет в чате!");
         }
