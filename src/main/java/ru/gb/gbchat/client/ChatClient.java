@@ -16,6 +16,7 @@ public class ChatClient {
     private LocalHistory localHistory;
     private final Controller controller;
 
+
     public ChatClient(Controller controller) {
         this.controller = controller;
     }

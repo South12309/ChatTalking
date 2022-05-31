@@ -1,9 +1,10 @@
 module ru.gb.chattalking {
     requires javafx.controls;
     requires javafx.fxml;
-    requires jfxmessagebox;
+  //  requires jfxmessagebox;
     requires java.desktop;
     requires java.sql;
+    requires org.apache.logging.log4j;
 
 
     exports ru.gb.gbchat;
