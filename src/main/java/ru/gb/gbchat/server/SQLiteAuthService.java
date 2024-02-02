@@ -1,6 +1,8 @@
 package ru.gb.gbchat.server;
 
 import java.io.IOException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 import java.sql.*;
@@ -8,6 +10,7 @@ import java.sql.*;
 
 public class SQLiteAuthService implements AuthService {
     private static Connection connection;
+    private static final Logger logger=LogManager.getLogger(SQLiteAuthService.class);
 
     public SQLiteAuthService() {
         run();
@@ -43,8 +46,10 @@ public class SQLiteAuthService implements AuthService {
 
         try {
             connection = DriverManager.getConnection("jdbc:sqlite:javadb.db");
+            logger.debug("Подключение к базе выполнено.");
         } catch (SQLException e) {
             e.printStackTrace();
+            logger.error("Ошибка при подключении к базе.");
         }
 
     }
@@ -55,7 +60,9 @@ public class SQLiteAuthService implements AuthService {
         try {
             if (connection != null)
                 connection.close();
+            logger.debug("Отключение от базы выполнено.");
         } catch (SQLException e) {
+            logger.error("Ошибка при отключении от базе.");
             e.printStackTrace();
         }
     }

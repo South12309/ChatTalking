@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.net.Socket;
 import java.sql.SQLException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.gb.gbchat.Command;
 
 public class ClientHandler {
@@ -15,6 +17,7 @@ public class ClientHandler {
     private final DataInputStream in;
     private final DataOutputStream out;
     private final AuthService authService;
+    private static final Logger logger = LogManager.getLogger(ClientHandler.class);
 
     private String nick;
 
@@ -37,7 +40,9 @@ public class ClientHandler {
             });
 
         } catch (IOException e) {
+            logger.error("Произошла ошибка подключения клиента");
             throw new RuntimeException(e);
+
         }
 
 
@@ -76,7 +81,6 @@ public class ClientHandler {
                 Thread.sleep(TIMEOUT_AUTH);
                 closeConnection();
             } catch (InterruptedException e) {
-                e.printStackTrace();
             }
         });
         timeToAuth.setDaemon(true);
@@ -131,6 +135,7 @@ public class ClientHandler {
         try {
             System.out.println("SERVER: Send message to " + nick);
             out.writeUTF(message);
+            logger.info("Клиенту " + nick + "отправлено: " + message);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -164,6 +169,7 @@ public class ClientHandler {
                         try {
                             authService.setNewNick(nick, params[0]);
                             server.broadcast(nick + " изменил ник на " + params[0]);
+                            logger.info(nick + " изменил ник на " + params[0]);
                             server.unsubscribe(this);
                             nick=params[0];
                             server.subscribe(this);
@@ -179,6 +185,7 @@ public class ClientHandler {
 
                 }
                 server.broadcast(nick + ": " + msg);
+                logger.info(nick + ": " + msg);
             }
         } catch (IOException e) {
             System.out.println("Подключение потеряно для отправки сообщаения");
